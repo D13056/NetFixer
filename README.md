@@ -110,7 +110,9 @@ NetFixer/
 ## 🚀 Getting Started
 
 ### Download
-Grab the latest `NetFixer.exe` from [Releases](../../releases) — no installation needed.
+👉 **[Download NetFixer.exe (64 KB) — v1.0.0](https://github.com/D13056/NetFixer/releases/download/v1.0.0/NetFixer.exe)**
+
+No installation needed. Just download and run as Administrator.
 
 ### Build from Source
 ```powershell
