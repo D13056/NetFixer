@@ -1,11 +1,6 @@
 # ⚡ NetFixer — Windows Network Diagnostic & Auto-Repair Tool
 
 <p align="center">
-  <img src="screenshots/main_window.png" alt="NetFixer — Main Window" width="49%"/>
-  <img src="screenshots/after_scan.png" alt="NetFixer — After Scan" width="49%"/>
-</p>
-
-<p align="center">
   <img src="https://img.shields.io/badge/Platform-Windows%2010%2F11-0078D4?style=flat-square&logo=windows"/>
   <img src="https://img.shields.io/badge/.NET%20Framework-4.8-512BD4?style=flat-square&logo=dotnet"/>
   <img src="https://img.shields.io/badge/Language-C%23-239120?style=flat-square&logo=csharp"/>
