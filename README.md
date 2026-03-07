@@ -1,7 +1,8 @@
 # ⚡ NetFixer — Windows Network Diagnostic & Auto-Repair Tool
 
 <p align="center">
-  <img src="screenshots/main_window.png" alt="NetFixer Main Window" width="700"/>
+  <img src="screenshots/main_window.png" alt="NetFixer — Main Window" width="49%"/>
+  <img src="screenshots/after_scan.png" alt="NetFixer — After Scan" width="49%"/>
 </p>
 
 <p align="center">
@@ -22,9 +23,10 @@
 
 ## 📸 Screenshots
 
-| Main Window | After Scan |
-|-------------|-----------|
-| ![Main](screenshots/main_window.png) | ![Scan](screenshots/after_scan.png) |
+<p align="center">
+  <img src="screenshots/main_window.png" alt="Main Window" width="49%"/>
+  <img src="screenshots/after_scan.png" alt="After Scan" width="49%"/>
+</p>
 
 ---
 
