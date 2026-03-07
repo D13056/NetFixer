@@ -1,0 +1,568 @@
+<Window x:Class="NetFixer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:NetFixer"
+        Title="NetFixer"
+        Height="840" Width="1000" MinHeight="700" MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        Background="Transparent"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        ResizeMode="CanResizeWithGrip">
+
+  <Window.Resources>
+
+    <!-- ── Converters ─────────────────────────────────────────────────── -->
+    <local:StatusColorConverter  x:Key="StatusColor"/>
+    <local:StatusIconConverter   x:Key="StatusIcon"/>
+    <local:StatusTextConverter   x:Key="StatusText"/>
+    <local:BoolToVisConverter    x:Key="BoolToVis"/>
+    <local:FixButtonVisConverter x:Key="FixVis"/>
+
+    <!-- ── Color palette ─────────────────────────────────────────────── -->
+    <SolidColorBrush x:Key="BgDark"      Color="#0c0c1e"/>  <!-- window chrome        -->
+    <SolidColorBrush x:Key="BgCard"      Color="#161630"/>  <!-- cards – clearly diff  -->
+    <SolidColorBrush x:Key="BgStrip"     Color="#121228"/>  <!-- summary strip         -->
+    <SolidColorBrush x:Key="BorderCol"   Color="#2c2c50"/>  <!-- visible borders       -->
+    <SolidColorBrush x:Key="TextPrimary" Color="#e2e8f0"/>  <!-- bright body text      -->
+    <SolidColorBrush x:Key="TextMuted"   Color="#8898b4"/>  <!-- readable secondary    -->
+    <SolidColorBrush x:Key="ColorPass"   Color="#22c55e"/>
+    <SolidColorBrush x:Key="ColorFail"   Color="#ef4444"/>
+    <SolidColorBrush x:Key="ColorWarn"   Color="#f59e0b"/>
+    <SolidColorBrush x:Key="ColorCyan"   Color="#06c8ff"/>
+
+    <!-- ── Slim scrollbar ─────────────────────────────────────────────── -->
+    <Style x:Key="SlimScrollBar" TargetType="ScrollBar">
+      <Setter Property="Width" Value="3"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ScrollBar">
+            <Grid Background="Transparent">
+              <Track Name="PART_Track" IsDirectionReversed="True">
+                <Track.DecreaseRepeatButton>
+                  <RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="False"/>
+                </Track.DecreaseRepeatButton>
+                <Track.Thumb>
+                  <Thumb>
+                    <Thumb.Template>
+                      <ControlTemplate TargetType="Thumb">
+                        <Border Background="#383860" CornerRadius="2" Margin="0,2"/>
+                      </ControlTemplate>
+                    </Thumb.Template>
+                  </Thumb>
+                </Track.Thumb>
+                <Track.IncreaseRepeatButton>
+                  <RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="False"/>
+                </Track.IncreaseRepeatButton>
+              </Track>
+            </Grid>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- ── Scan button — pill gradient ───────────────────────────────── -->
+    <Style x:Key="ScanBtn" TargetType="Button">
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Height" Value="42"/>
+      <Setter Property="Padding" Value="26,0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Grid>
+              <!-- Ambient glow -->
+              <Border Margin="0,6,0,-6" CornerRadius="21" Opacity="0.30">
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#3d7ef6" Offset="0"/>
+                    <GradientStop Color="#00c8f8" Offset="1"/>
+                  </LinearGradientBrush>
+                </Border.Background>
+                <Border.Effect><BlurEffect Radius="16"/></Border.Effect>
+              </Border>
+              <!-- Pill body -->
+              <Border x:Name="Body" CornerRadius="21" Padding="{TemplateBinding Padding}">
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#4f8ef7" Offset="0"/>
+                    <GradientStop Color="#06c8ff" Offset="1"/>
+                  </LinearGradientBrush>
+                </Border.Background>
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  RecognizesAccessKey="True"/>
+              </Border>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Body" Property="Opacity" Value="0.85"/>
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Body" Property="Opacity" Value="0.70"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="Body" Property="Opacity" Value="0.30"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- ── Fix-all button — pill purple→pink ────────────────────────── -->
+    <Style x:Key="FixAllBtn" TargetType="Button">
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Height" Value="42"/>
+      <Setter Property="Padding" Value="26,0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Grid>
+              <Border Margin="0,6,0,-6" CornerRadius="21" Opacity="0.28">
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#7c3aed" Offset="0"/>
+                    <GradientStop Color="#db2777" Offset="1"/>
+                  </LinearGradientBrush>
+                </Border.Background>
+                <Border.Effect><BlurEffect Radius="16"/></Border.Effect>
+              </Border>
+              <Border x:Name="Body" CornerRadius="21" Padding="{TemplateBinding Padding}">
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#7c3aed" Offset="0"/>
+                    <GradientStop Color="#db2777" Offset="1"/>
+                  </LinearGradientBrush>
+                </Border.Background>
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  RecognizesAccessKey="True"/>
+              </Border>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Body" Property="Opacity" Value="0.85"/>
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Body" Property="Opacity" Value="0.70"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="Body" Property="Opacity" Value="0.28"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- ── Inline fix button — outlined ghost pill ───────────────────── -->
+    <Style x:Key="FixBtn" TargetType="Button">
+      <Setter Property="Foreground" Value="#60a5fa"/>
+      <Setter Property="FontSize" Value="11"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Margin" Value="0,8,0,0"/>
+      <Setter Property="Height" Value="28"/>
+      <Setter Property="Padding" Value="14,0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Body" CornerRadius="14" Background="#0f1f3d"
+                    BorderThickness="1" BorderBrush="#1e3a6e"
+                    Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Body" Property="Background" Value="#172a50"/>
+                <Setter TargetName="Body" Property="BorderBrush" Value="#3b6ac7"/>
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Body" Property="Background" Value="#0d1a33"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="Body" Property="Opacity" Value="0.35"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- ── Window control button ─────────────────────────────────────── -->
+    <Style x:Key="WindowBtn" TargetType="Button">
+      <Setter Property="Width"  Value="32"/>
+      <Setter Property="Height" Value="32"/>
+      <Setter Property="Foreground" Value="#5a6e8a"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Body" CornerRadius="8" Background="Transparent">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Body" Property="Background" Value="#181828"/>
+                <Setter Property="Foreground" Value="#94a3b8"/>
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Body" Property="Background" Value="#111120"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- ── Close button — turns red on hover ────────────────────────── -->
+    <Style x:Key="CloseBtn" TargetType="Button" BasedOn="{StaticResource WindowBtn}">
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Body" CornerRadius="8" Background="Transparent">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Body" Property="Background" Value="#3a1020"/>
+                <Setter Property="Foreground" Value="#f87171"/>
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Body" Property="Background" Value="#2a0c18"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+  </Window.Resources>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!--  ROOT SHELL                                                          -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <Border CornerRadius="18" Background="{StaticResource BgDark}"
+          BorderBrush="{StaticResource BorderCol}" BorderThickness="1">
+    <Border.Effect>
+      <DropShadowEffect Color="#000000" BlurRadius="55" ShadowDepth="0" Opacity="0.85"/>
+    </Border.Effect>
+
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="54"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="44"/>
+      </Grid.RowDefinitions>
+
+      <!-- ═══ TITLE BAR ════════════════════════════════════════════════ -->
+      <Grid Grid.Row="0" Margin="18,0"
+            MouseLeftButtonDown="TitleBar_MouseDown" Cursor="SizeAll">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Brand -->
+        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+          <Border Width="30" Height="30" CornerRadius="9" Margin="0,0,10,0">
+            <Border.Background>
+              <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#4f8ef7" Offset="0"/>
+                <GradientStop Color="#06c8ff" Offset="1"/>
+              </LinearGradientBrush>
+            </Border.Background>
+            <TextBlock Text="⚡" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="NetFixer" FontSize="14" FontWeight="Bold"
+                       Foreground="{StaticResource TextPrimary}"/>
+            <TextBlock Text="Network Diagnostic &amp; Repair" FontSize="10"
+                       Foreground="{StaticResource TextMuted}"/>
+          </StackPanel>
+        </StackPanel>
+
+        <!-- Admin pill -->
+        <Border Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                Background="#112211" BorderBrush="#2a5030" BorderThickness="1"
+                CornerRadius="10" Padding="12,4">
+          <StackPanel Orientation="Horizontal">
+            <Ellipse Width="6" Height="6" Fill="#22c55e" Margin="0,0,7,0" VerticalAlignment="Center"/>
+            <TextBlock Text="Running as Administrator" FontSize="11"
+                       Foreground="#4ade80" FontWeight="SemiBold"/>
+          </StackPanel>
+        </Border>
+
+        <!-- Window controls -->
+        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+          <Button Style="{StaticResource WindowBtn}" Click="BtnMinimize_Click" Margin="0,0,2,0">
+            <TextBlock Text="─" FontSize="11"
+                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+          </Button>
+          <Button Style="{StaticResource CloseBtn}" Click="BtnClose_Click">
+            <TextBlock Text="✕" FontSize="11"
+                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+          </Button>
+        </StackPanel>
+      </Grid>
+
+      <!-- Hairline divider -->
+      <Rectangle Grid.Row="0" Height="1" VerticalAlignment="Bottom" Margin="18,0">
+        <Rectangle.Fill>
+          <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="Transparent" Offset="0"/>
+            <GradientStop Color="#2c2c50" Offset="0.15"/>
+            <GradientStop Color="#2c2c50" Offset="0.85"/>
+            <GradientStop Color="Transparent" Offset="1"/>
+          </LinearGradientBrush>
+        </Rectangle.Fill>
+      </Rectangle>
+
+      <!-- ═══ BODY ══════════════════════════════════════════════════════ -->
+      <Grid Grid.Row="1" Margin="18,16,18,0">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>   <!-- Action bar  -->
+          <RowDefinition Height="Auto"/>   <!-- Summary     -->
+          <RowDefinition Height="*"/>      <!-- Issue list  -->
+          <RowDefinition Height="Auto"/>   <!-- Log         -->
+        </Grid.RowDefinitions>
+
+        <!-- ─ Action bar ──────────────────────────────────────────────── -->
+        <Grid Grid.Row="0" Margin="0,0,0,14">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+
+          <StackPanel Grid.Column="0" VerticalAlignment="Center">
+            <TextBlock x:Name="TxtStatusLine"
+                       Text="Click Scan to analyze your network"
+                       FontSize="13" Foreground="{StaticResource TextMuted}"/>
+            <StackPanel x:Name="ProgressPanel" Orientation="Horizontal"
+                        Visibility="Collapsed" Margin="0,6,0,0">
+              <Border Width="160" Height="3" Background="#111124"
+                      CornerRadius="2" VerticalAlignment="Center">
+                <Border x:Name="ProgressFill" HorizontalAlignment="Left"
+                        Height="3" Width="0" CornerRadius="2">
+                  <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                      <GradientStop Color="#4f8ef7" Offset="0"/>
+                      <GradientStop Color="#06c8ff" Offset="1"/>
+                    </LinearGradientBrush>
+                  </Border.Background>
+                </Border>
+              </Border>
+              <TextBlock x:Name="TxtProgress"
+                         Text="0 / 10" FontSize="11"
+                         Foreground="{StaticResource TextMuted}"
+                         Margin="10,0,0,0" VerticalAlignment="Center"
+                         FontFamily="Consolas"/>
+            </StackPanel>
+          </StackPanel>
+
+          <Button Grid.Column="1" x:Name="BtnScan" Style="{StaticResource ScanBtn}"
+                  Click="BtnScan_Click">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+              <TextBlock Text="⟳" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+              <TextBlock Text="Scan Network" FontSize="13" FontWeight="SemiBold"
+                         VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+
+          <Button Grid.Column="3" x:Name="BtnFixAll" Style="{StaticResource FixAllBtn}"
+                  Click="BtnFixAll_Click" IsEnabled="False">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+              <TextBlock Text="⚡" FontSize="13" Margin="0,0,8,0" VerticalAlignment="Center"/>
+              <TextBlock Text="Fix All Issues" FontSize="13" FontWeight="SemiBold"
+                         VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+        </Grid>
+
+        <!-- ─ Summary strip ───────────────────────────────────────────── -->
+        <Border Grid.Row="1" CornerRadius="14" Margin="0,0,0,14"
+                Background="{StaticResource BgStrip}"
+                BorderBrush="{StaticResource BorderCol}" BorderThickness="1"
+                Padding="0,15">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="1"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="1"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="1"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+              <TextBlock x:Name="TxtPass" Text="—" FontSize="26" FontWeight="Bold"
+                         Foreground="{StaticResource ColorPass}" HorizontalAlignment="Center"/>
+              <TextBlock Text="Passing" FontSize="10" Foreground="#4ade80"
+                         HorizontalAlignment="Center" Margin="0,3,0,0" FontWeight="SemiBold"/>
+            </StackPanel>
+            <Rectangle Grid.Column="1" Fill="{StaticResource BorderCol}"/>
+
+            <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+              <TextBlock x:Name="TxtFail" Text="—" FontSize="26" FontWeight="Bold"
+                         Foreground="{StaticResource ColorFail}" HorizontalAlignment="Center"/>
+              <TextBlock Text="Failed" FontSize="10" Foreground="#f87171"
+                         HorizontalAlignment="Center" Margin="0,3,0,0" FontWeight="SemiBold"/>
+            </StackPanel>
+            <Rectangle Grid.Column="3" Fill="{StaticResource BorderCol}"/>
+
+            <StackPanel Grid.Column="4" HorizontalAlignment="Center">
+              <TextBlock x:Name="TxtWarn" Text="—" FontSize="26" FontWeight="Bold"
+                         Foreground="{StaticResource ColorWarn}" HorizontalAlignment="Center"/>
+              <TextBlock Text="Warnings" FontSize="10" Foreground="#fbbf24"
+                         HorizontalAlignment="Center" Margin="0,3,0,0" FontWeight="SemiBold"/>
+            </StackPanel>
+            <Rectangle Grid.Column="5" Fill="{StaticResource BorderCol}"/>
+
+            <StackPanel Grid.Column="6" HorizontalAlignment="Center">
+              <TextBlock x:Name="TxtFixed" Text="—" FontSize="26" FontWeight="Bold"
+                         Foreground="{StaticResource ColorCyan}" HorizontalAlignment="Center"/>
+              <TextBlock Text="Fixed" FontSize="10" Foreground="#22d3ee"
+                         HorizontalAlignment="Center" Margin="0,3,0,0" FontWeight="SemiBold"/>
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <!-- ─ Issue list ──────────────────────────────────────────────── -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled" Padding="0,0,4,0">
+          <ScrollViewer.Resources>
+            <Style TargetType="ScrollBar" BasedOn="{StaticResource SlimScrollBar}"/>
+          </ScrollViewer.Resources>
+          <ItemsControl x:Name="IssueList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border CornerRadius="13" Margin="0,0,0,7" BorderThickness="1"
+                        Background="{StaticResource BgCard}"
+                        BorderBrush="{StaticResource BorderCol}"
+                        Padding="16,13">
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="46"/>
+                      <ColumnDefinition Width="*"/>
+                      <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Status icon badge -->
+                    <Border Grid.Column="0" Width="34" Height="34" CornerRadius="10"
+                            VerticalAlignment="Top" HorizontalAlignment="Left">
+                      <Border.Background>
+                        <SolidColorBrush Color="{Binding Status,
+                            Converter={StaticResource StatusColor},
+                            ConverterParameter=bg}"/>
+                      </Border.Background>
+                      <TextBlock Text="{Binding Status, Converter={StaticResource StatusIcon}}"
+                                 FontSize="15" HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"/>
+                    </Border>
+
+                    <!-- Text content -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Top">
+                      <TextBlock Text="{Binding Title}" FontSize="13" FontWeight="SemiBold"
+                                 Foreground="{StaticResource TextPrimary}" Margin="0,0,0,2"/>
+                      <TextBlock Text="{Binding Description}" FontSize="11"
+                                 Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
+                      <TextBlock Text="{Binding Detail}" FontSize="11" TextWrapping="Wrap"
+                                 Foreground="#7a99bc" FontFamily="Consolas" LineHeight="17"
+                                 Visibility="{Binding Detail, Converter={StaticResource BoolToVis}}"/>
+                      <Button Content="⚡  Auto-Fix This Issue"
+                              Tag="{Binding}"
+                              Style="{StaticResource FixBtn}"
+                              HorizontalAlignment="Left"
+                              Click="BtnFixOne_Click"
+                              Visibility="{Binding CanFix, Converter={StaticResource FixVis}}"/>
+                    </StackPanel>
+
+                    <!-- Status pill -->
+                    <Border Grid.Column="2" VerticalAlignment="Top" Margin="10,0,0,0"
+                            CornerRadius="8" Padding="9,4">
+                      <Border.Background>
+                        <SolidColorBrush Color="{Binding Status,
+                            Converter={StaticResource StatusColor},
+                            ConverterParameter=bg}"/>
+                      </Border.Background>
+                      <TextBlock Text="{Binding Status, Converter={StaticResource StatusText}}"
+                                 FontSize="10" FontWeight="Bold">
+                        <TextBlock.Foreground>
+                          <SolidColorBrush Color="{Binding Status,
+                              Converter={StaticResource StatusColor},
+                              ConverterParameter=fg}"/>
+                        </TextBlock.Foreground>
+                      </TextBlock>
+                    </Border>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+
+        <!-- ─ Log panel ──────────────────────────────────────────────── -->
+        <Border Grid.Row="3" CornerRadius="13" Margin="0,10,0,0" Height="108"
+                Background="{StaticResource BgCard}"
+                BorderBrush="{StaticResource BorderCol}" BorderThickness="1">
+          <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="30"/>
+              <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="14,0">
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Ellipse Width="5" Height="5" Fill="#4a6080" Margin="0,0,8,0"/>
+                <TextBlock Text="Activity Log" FontSize="11" FontWeight="SemiBold"
+                           Foreground="#6a88b0"/>
+              </StackPanel>
+              <Button HorizontalAlignment="Right" VerticalAlignment="Center"
+                      Style="{StaticResource WindowBtn}" Width="24" Height="24"
+                      Click="BtnClearLog_Click" ToolTip="Clear log">
+                <TextBlock Text="✕" FontSize="9"/>
+              </Button>
+            </Grid>
+            <Rectangle Grid.Row="0" Height="1" VerticalAlignment="Bottom"
+                       Fill="{StaticResource BorderCol}"/>
+            <ScrollViewer Grid.Row="1" x:Name="LogScroll"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="14,7">
+              <ScrollViewer.Resources>
+                <Style TargetType="ScrollBar" BasedOn="{StaticResource SlimScrollBar}"/>
+              </ScrollViewer.Resources>
+              <TextBlock x:Name="TxtLog" FontSize="11" Foreground="#5878a0"
+                         FontFamily="Consolas" TextWrapping="Wrap" LineHeight="17"
+                         Text="[ NetFixer ready — click Scan to begin ]"/>
+            </ScrollViewer>
+          </Grid>
+        </Border>
+      </Grid>
+
+      <!-- ═══ FOOTER ════════════════════════════════════════════════════ -->
+      <Border Grid.Row="2" CornerRadius="0,0,18,18"
+              Background="#0d0d20"
+              BorderBrush="{StaticResource BorderCol}" BorderThickness="0,1,0,0">
+        <Grid Margin="18,0">
+          <TextBlock VerticalAlignment="Center" FontSize="10" Foreground="#4a5c78"
+                     Text="NetFixer v1.0  ·  10 checks: WiFi · DHCP · Routing · Power Saving · Wi-Fi Direct · DNS · Proxy · Internet · Winsock · Avast"/>
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <Ellipse Width="5" Height="5" Fill="#2a5040" Margin="0,0,6,0"/>
+            <TextBlock Text="All auto-fixes require Administrator privileges"
+                       FontSize="10" Foreground="#3a6050"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+    </Grid>
+  </Border>
+</Window>

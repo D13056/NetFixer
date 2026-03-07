@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!-- .NET Framework 4.8 is pre-installed on Windows 10/11 —
+         the EXE is ~400 KB with no bundled runtime, starts instantly. -->
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>NetFixer</AssemblyName>
+    <RootNamespace>NetFixer</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Optimize>true</Optimize>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Both assemblies are pre-installed as part of .NET Framework -->
+    <Reference Include="System.Management" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+</Project>
