@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="NetFixer — Free portable Windows network repair tool. Fix WiFi, DNS, Winsock, DHCP, proxy and routing issues automatically. 64KB EXE, no install required."/>
+  <meta property="og:title" content="NetFixer — Windows Network Auto-Repair Tool"/>
+  <meta property="og:description" content="Fix WiFi, DNS, Winsock, DHCP and more with one click. Free 64KB portable EXE for Windows 10/11."/>
+  <meta property="og:image" content="https://raw.githubusercontent.com/D13056/NetFixer/main/screenshots/main_window.png"/>
+  <title>NetFixer — Windows Network Repair Tool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #06060f;
+      --bg2:       #0c0c1e;
+      --card:      #10102a;
+      --border:    #1e1e42;
+      --border2:   #2a2a58;
+      --text:      #e2e8f0;
+      --muted:     #8898b4;
+      --dim:       #4a5568;
+      --cyan:      #06c8ff;
+      --blue:      #3b82f6;
+      --purple:    #8b5cf6;
+      --pink:      #ec4899;
+      --green:     #22c55e;
+      --yellow:    #f59e0b;
+      --red:       #ef4444;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%; height: 64px;
+      background: rgba(6,6,15,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.2rem; }
+    .logo span.bolt { font-size: 1.4rem; }
+    .logo span.name { background: linear-gradient(135deg, var(--cyan), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    nav ul { list-style: none; display: flex; gap: 2rem; }
+    nav ul a { color: var(--muted); text-decoration: none; font-size: .9rem; font-weight: 500; transition: color .2s; }
+    nav ul a:hover { color: var(--text); }
+    .nav-cta {
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      color: #000 !important; font-weight: 700 !important; font-size: .85rem !important;
+      padding: 8px 20px; border-radius: 999px; transition: opacity .2s !important;
+    }
+    .nav-cta:hover { opacity: .85; color: #000 !important; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 5% 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 900px; height: 900px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(59,130,246,.13) 0%, rgba(6,200,255,.07) 40%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid var(--border2); border-radius: 999px;
+      padding: 6px 16px; font-size: .8rem; color: var(--cyan);
+      background: rgba(6,200,255,.07); margin-bottom: 28px;
+      animation: fadeUp .6s ease both;
+    }
+    .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:none} }
+
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 4.8rem);
+      font-weight: 900; line-height: 1.08; letter-spacing: -.03em;
+      margin-bottom: 24px;
+      animation: fadeUp .7s .1s ease both;
+    }
+    h1 .grad {
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--blue) 50%, var(--purple) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.25rem); color: var(--muted); max-width: 640px;
+      margin-bottom: 40px;
+      animation: fadeUp .7s .2s ease both;
+    }
+    .hero-btns {
+      display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp .7s .3s ease both;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      color: #000; font-weight: 700; font-size: 1rem;
+      padding: 14px 32px; border-radius: 999px; text-decoration: none;
+      box-shadow: 0 0 40px rgba(59,130,246,.4);
+      transition: box-shadow .3s, transform .2s;
+    }
+    .btn-primary:hover { box-shadow: 0 0 60px rgba(59,130,246,.6); transform: translateY(-2px); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 10px;
+      border: 1px solid var(--border2); color: var(--text); font-weight: 600; font-size: 1rem;
+      padding: 14px 32px; border-radius: 999px; text-decoration: none;
+      background: rgba(255,255,255,.03);
+      transition: border-color .2s, background .2s;
+    }
+    .btn-secondary:hover { border-color: var(--blue); background: rgba(59,130,246,.07); }
+
+    .hero-meta {
+      margin-top: 28px; display: flex; gap: 24px; flex-wrap: wrap; justify-content: center;
+      font-size: .82rem; color: var(--dim);
+      animation: fadeUp .7s .4s ease both;
+    }
+    .hero-meta span { display: flex; align-items: center; gap: 6px; }
+    .hero-meta .ok { color: var(--green); }
+
+    /* ── SCREENSHOTS ── */
+    .screenshots {
+      padding: 80px 5%;
+      display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+      animation: fadeUp .7s .5s ease both;
+    }
+    .screenshots img {
+      width: 48%; max-width: 640px; border-radius: 16px;
+      border: 1px solid var(--border2);
+      box-shadow: 0 24px 80px rgba(0,0,0,.6);
+      transition: transform .3s, box-shadow .3s;
+    }
+    .screenshots img:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 32px 100px rgba(0,0,0,.8); }
+    .screenshots .cap { font-size: .78rem; color: var(--dim); text-align: center; margin-top: 8px; }
+    .ss-wrap { display: flex; flex-direction: column; align-items: center; width: 48%; max-width: 640px; }
+
+    /* ── PROBLEMS ── */
+    .section { padding: 100px 5%; max-width: 1200px; margin: 0 auto; }
+    .section-label { font-size: .8rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); margin-bottom: 12px; }
+    .section-title { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
+    .section-sub { color: var(--muted); font-size: 1.05rem; max-width: 560px; margin-bottom: 56px; }
+
+    .problems-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;
+    }
+    .problem-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 22px;
+      display: flex; align-items: flex-start; gap: 14px;
+      transition: border-color .2s, background .2s;
+    }
+    .problem-card:hover { border-color: var(--border2); background: #13132e; }
+    .problem-icon { font-size: 1.3rem; margin-top: 2px; flex-shrink: 0; }
+    .problem-text { font-size: .92rem; color: var(--muted); line-height: 1.5; }
+    .problem-text strong { color: var(--text); display: block; margin-bottom: 2px; font-size: .95rem; }
+
+    /* ── CHECKS ── */
+    .checks-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px;
+    }
+    .check-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px;
+      position: relative; overflow: hidden;
+      transition: transform .2s, border-color .2s;
+    }
+    .check-card:hover { transform: translateY(-4px); border-color: var(--border2); }
+    .check-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--blue), var(--cyan));
+      opacity: 0; transition: opacity .2s;
+    }
+    .check-card:hover::before { opacity: 1; }
+    .check-num { font-size: .75rem; font-weight: 700; letter-spacing: .1em; color: var(--dim); margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; }
+    .check-title { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .check-desc { font-size: .87rem; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+    .check-fix {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .78rem; font-weight: 600; color: var(--green);
+      background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.2);
+      padding: 4px 12px; border-radius: 999px;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps { display: flex; flex-direction: column; gap: 0; max-width: 700px; }
+    .step { display: flex; gap: 24px; position: relative; padding-bottom: 48px; }
+    .step:last-child { padding-bottom: 0; }
+    .step-line {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .step-num {
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: .95rem;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      color: #000; z-index: 1;
+    }
+    .step-connector {
+      width: 2px; flex: 1; background: linear-gradient(var(--border2), transparent);
+      margin-top: 4px;
+    }
+    .step:last-child .step-connector { display: none; }
+    .step-body { padding-top: 8px; }
+    .step-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+    .step-desc { font-size: .9rem; color: var(--muted); line-height: 1.6; }
+    .step-code {
+      margin-top: 10px; background: rgba(255,255,255,.04); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px;
+      font-family: 'JetBrains Mono', monospace; font-size: .78rem; color: var(--cyan);
+    }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: flex; gap: 1px; flex-wrap: wrap;
+      border: 1px solid var(--border); border-radius: 20px; overflow: hidden;
+      margin: 60px 0;
+    }
+    .stat {
+      flex: 1; min-width: 160px; padding: 36px 24px; text-align: center;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+    .stat-val { font-size: 2.4rem; font-weight: 900; line-height: 1; margin-bottom: 6px; }
+    .stat-val.cyan { color: var(--cyan); }
+    .stat-val.blue { color: var(--blue); }
+    .stat-val.green { color: var(--green); }
+    .stat-val.purple { color: var(--purple); }
+    .stat-label { font-size: .82rem; color: var(--muted); font-weight: 500; }
+
+    /* ── COMPARE ── */
+    .compare-table { width: 100%; border-collapse: collapse; border-radius: 16px; overflow: hidden; }
+    .compare-table th, .compare-table td { padding: 14px 20px; text-align: left; font-size: .9rem; border-bottom: 1px solid var(--border); }
+    .compare-table th { background: var(--card); font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table td:first-child { color: var(--text); font-weight: 600; }
+    .compare-table td:not(:first-child) { color: var(--muted); text-align: center; }
+    .compare-table .hi td { background: rgba(59,130,246,.05); }
+    .compare-table .hi td:nth-child(2) { color: var(--cyan) !important; font-weight: 700; }
+    .yes { color: var(--green) !important; font-weight: 700; }
+    .no  { color: var(--red)   !important; }
+    .meh { color: var(--yellow)!important; }
+
+    /* ── FAQ ── */
+    .faq { display: flex; flex-direction: column; gap: 12px; max-width: 800px; }
+    .faq-item { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .faq-q {
+      padding: 18px 22px; font-weight: 600; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      transition: background .2s;
+    }
+    .faq-q:hover { background: rgba(255,255,255,.03); }
+    .faq-q .arrow { color: var(--muted); transition: transform .3s; font-size: 1.2rem; }
+    .faq-item.open .faq-q .arrow { transform: rotate(45deg); }
+    .faq-a { display: none; padding: 0 22px 18px; color: var(--muted); font-size: .92rem; line-height: 1.7; }
+    .faq-item.open .faq-a { display: block; }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 120px 5%; text-align: center;
+      background: radial-gradient(ellipse at 50% 100%, rgba(59,130,246,.12) 0%, transparent 60%);
+    }
+    .cta-section h2 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; margin-bottom: 16px; }
+    .cta-section p { color: var(--muted); font-size: 1.1rem; margin-bottom: 40px; }
+    .cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn-big {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      color: #000; font-weight: 800; font-size: 1.1rem;
+      padding: 18px 40px; border-radius: 999px; text-decoration: none;
+      box-shadow: 0 0 60px rgba(59,130,246,.45);
+      transition: box-shadow .3s, transform .2s;
+    }
+    .btn-big:hover { box-shadow: 0 0 90px rgba(59,130,246,.7); transform: translateY(-3px); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 5%;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+      font-size: .82rem; color: var(--dim);
+    }
+    footer a { color: var(--dim); text-decoration: none; }
+    footer a:hover { color: var(--muted); }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-logo { font-weight: 800; color: var(--muted); }
+
+    /* ── DIVIDER ── */
+    .divider { width: 100%; height: 1px; background: var(--border); margin: 0; }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:760px) {
+      nav ul { display: none; }
+      .screenshots img, .ss-wrap { width: 95%; max-width: 100%; }
+      .stats-row { flex-direction: column; }
+      .stat { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat:last-child { border-bottom: none; }
+    }
+
+    /* ── GLOW ORBS ── */
+    .orb {
+      position: fixed; border-radius: 50%; pointer-events: none; opacity: .15; filter: blur(80px); z-index: 0;
+    }
+    .orb1 { width: 500px; height: 500px; background: var(--blue); top: -150px; right: -100px; }
+    .orb2 { width: 400px; height: 400px; background: var(--purple); bottom: 20%; left: -100px; }
+  </style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <span class="bolt">⚡</span>
+    <span class="name">NetFixer</span>
+  </div>
+  <ul>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#checks">Checks</a></li>
+    <li><a href="#howto">How it works</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="https://github.com/D13056/NetFixer" target="_blank">GitHub</a></li>
+    <li><a href="https://github.com/D13056/NetFixer/releases/download/v1.0.0/NetFixer.exe" class="nav-cta">⬇ Download</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge"><span class="dot"></span> Free · Open Source · No Install · 64 KB</div>
+  <h1>Fix Your Windows<br/><span class="grad">Internet Problems</span><br/>In One Click</h1>
+  <p class="hero-sub">
+    NetFixer automatically diagnoses and repairs WiFi, DNS, Winsock, DHCP, proxy and routing issues on Windows 10 and 11 — in seconds, with no installation.
+  </p>
+  <div class="hero-btns">
+    <a href="https://github.com/D13056/NetFixer/releases/download/v1.0.0/NetFixer.exe" class="btn-primary">
+      ⬇ Download Free — 64 KB
+    </a>
+    <a href="https://github.com/D13056/NetFixer" target="_blank" class="btn-secondary">
+      ★ View on GitHub
+    </a>
+  </div>
+  <div class="hero-meta">
+    <span><span class="ok">✓</span> Windows 10 / 11</span>
+    <span><span class="ok">✓</span> No installation</span>
+    <span><span class="ok">✓</span> .NET 4.8 pre-installed on all Windows</span>
+    <span><span class="ok">✓</span> Open source (MIT)</span>
+  </div>
+</section>
+
+<!-- STATS -->
+<div style="max-width:1200px;margin:0 auto;padding:0 5%">
+  <div class="stats-row">
+    <div class="stat"><div class="stat-val cyan">64 KB</div><div class="stat-label">EXE file size</div></div>
+    <div class="stat"><div class="stat-val blue">10</div><div class="stat-label">Diagnostic checks</div></div>
+    <div class="stat"><div class="stat-val green">&lt;1s</div><div class="stat-label">Startup time</div></div>
+    <div class="stat"><div class="stat-val purple">0</div><div class="stat-label">Dependencies</div></div>
+  </div>
+</div>
+
+<!-- SCREENSHOTS -->
+<div class="screenshots">
+  <div class="ss-wrap">
+    <img src="https://raw.githubusercontent.com/D13056/NetFixer/main/screenshots/main_window.png" alt="NetFixer main window — network diagnostic tool for Windows"/>
+    <p class="cap">Main window — clean, instant scan</p>
+  </div>
+  <div class="ss-wrap">
+    <img src="https://raw.githubusercontent.com/D13056/NetFixer/main/screenshots/after_scan.png" alt="NetFixer scan results — issues found and auto-fix available"/>
+    <p class="cap">After scan — issues detected with one-click fixes</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PROBLEMS SECTION -->
+<div class="section" id="features">
+  <p class="section-label">Common Problems</p>
+  <h2 class="section-title">Does your Windows PC have any of these?</h2>
+  <p class="section-sub">NetFixer detects and auto-fixes all of these in a single scan.</p>
+  <div class="problems-grid">
+    <div class="problem-card"><div class="problem-icon">📶</div><div class="problem-text"><strong>WiFi connected, no internet</strong>IP assigned but all traffic blocked — gateway, DNS, or routing issue</div></div>
+    <div class="problem-card"><div class="problem-icon">🔴</div><div class="problem-text"><strong>169.254.x.x IP address</strong>APIPA self-assigned IP means DHCP server isn't responding</div></div>
+    <div class="problem-card"><div class="problem-icon">🌐</div><div class="problem-text"><strong>DNS not resolving</strong>Websites won't load by name but ping to IP works fine</div></div>
+    <div class="problem-card"><div class="problem-icon">⚡</div><div class="problem-text"><strong>Random disconnections</strong>WiFi drops and reconnects, especially on battery power</div></div>
+    <div class="problem-card"><div class="problem-icon">🔌</div><div class="problem-text"><strong>USB tethering overrides WiFi</strong>Phone hotspot connected, WiFi routing broken as a result</div></div>
+    <div class="problem-card"><div class="problem-icon">🛡</div><div class="problem-text"><strong>Antivirus blocking DNS</strong>Avast Web Shield intercepting and timing out DNS queries</div></div>
+    <div class="problem-card"><div class="problem-icon">🔧</div><div class="problem-text"><strong>Winsock / TCP stack corruption</strong>Windows network stack needs reset after bad install or update</div></div>
+    <div class="problem-card"><div class="problem-icon">🚫</div><div class="problem-text"><strong>Proxy blocking connections</strong>Leftover proxy settings from VPN or enterprise config</div></div>
+    <div class="problem-card"><div class="problem-icon">📡</div><div class="problem-text"><strong>Wi-Fi Direct adapter conflicts</strong>Virtual adapter causing NDIS Event 74 errors in system log</div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- CHECKS -->
+<div class="section" id="checks">
+  <p class="section-label">Diagnostic Engine</p>
+  <h2 class="section-title">10 automated checks,<br/>10 auto-fixes</h2>
+  <p class="section-sub">Every check runs in sequence — each with a dedicated auto-fix ready to apply.</p>
+  <div class="checks-grid">
+    <div class="check-card">
+      <div class="check-num">CHECK 01</div>
+      <div class="check-title">WiFi Adapter Status</div>
+      <div class="check-desc">Verifies adapter is present, enabled, has a valid IP and default gateway, and reports link speed.</div>
+      <div class="check-fix">✓ Re-enable adapter</div>
+    </div>
+    <div class="check-card">
+      <div class="check-num">CHECK 02</div>
+      <div class="check-title">DHCP IP Lease</div>
+      <div class="check-desc">Detects APIPA 169.254.x.x addresses that indicate DHCP server unreachable or adapter misconfigured.</div>
+      <div class="check-fix">✓ Release + Renew lease</div>
+    </div>
+    <div class="check-card">
+      <div class="check-num">CHECK 03</div>
+      <div class="check-title">Routing Priority (Interface Metric)</div>
+      <div class="check-desc">Checks if USB tethering or Ethernet has a lower metric than WiFi, causing traffic to bypass WiFi.</div>
+      <div class="check-fix">✓ Set WiFi metric = 10</div>
+    </div>
+    <div class="check-card">
+      <div class="check-num">CHECK 04</div>
+      <div class="check-title">WiFi Power Saving Mode</div>
+      <div class="check-desc">Detects battery power plan setting that turns off the WiFi adapter to save power, causing drops.</div>
+      <div class="check-fix">✓ Set Maximum Performance</div>
+    </div>
+    <div class="check-card">
+      <div class="check-num">CHECK 05</div>
+      <div class="check-title">Wi-Fi Direct Virtual Adapter</div>
+      <div class="check-desc">Finds Wi-Fi Direct virtual adapters that conflict with the real adapter and cause NDIS Event 74 errors.</div>
+      <div class="check-fix">✓ Disable virtual adapters</div>
+    </div>
+    <div class="check-card">
+      <div class="check-num">CHECK 06</div>
+      <div class="check-title">DNS Resolution</div>
+      <div class="check-desc">Attempts to resolve google.com and measures latency. Flags failures and slow responses above threshold.</div>
+      <div class="check-fix">✓ Set Google DNS 8.8.8.8</div>
+    </div>
+    <div class="check-card">
+      <div class="check-num">CHECK 07</div>
+      <div class="check-title">Proxy Settings</div>
+      <div class="check-desc">Reads registry for system proxy configuration. If proxy is enabled but server is unreachable, traffic is blocked.</div>
+      <div class="check-fix">✓ Disable proxy + reset WinHTTP</div>
+    </div>
+    <div class="check-card">
+      <div class="check-num">CHECK 08</div>
+      <div class="check-title">Internet Reachability</div>
+      <div class="check-desc">ICMP ping to 8.8.8.8 followed by HTTPS GET to google.com — verifies full end-to-end connectivity.</div>
+      <div class="check-fix">✓ Full network stack reset</div>
+    </div>
+    <div class="check-card">
+      <div class="check-num">CHECK 09</div>
+      <div class="check-title">Winsock / TCP-IP Stack</div>
+      <div class="check-desc">Validates Winsock LSP catalog entry count. Fewer than 10 entries indicates corruption from bad software.</div>
+      <div class="check-fix">✓ netsh winsock reset</div>
+    </div>
+    <div class="check-card">
+      <div class="check-num">CHECK 10</div>
+      <div class="check-title">Antivirus DNS Interference</div>
+      <div class="check-desc">Checks if Avast is running AND has generated DNS timeout events in the Windows Event Log within last 24 hours.</div>
+      <div class="check-fix">✓ Flush DNS + restart service</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- COMPARE -->
+<div class="section">
+  <p class="section-label">Comparison</p>
+  <h2 class="section-title">Why NetFixer over manual fixes?</h2>
+  <p class="section-sub">Other options are slow, complex, or cost money. NetFixer is instant and free.</p>
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>NetFixer</th>
+        <th>Manual CMD</th>
+        <th>Windows Troubleshooter</th>
+        <th>Paid Tools</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="hi"><td>File size</td><td><span class="yes">64 KB</span></td><td>0 KB</td><td>Built-in</td><td>10–200 MB</td></tr>
+      <tr><td>No installation</td><td><span class="yes">✓ Always</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="no">✗ Requires install</span></td></tr>
+      <tr class="hi"><td>10 checks in one scan</td><td><span class="yes">✓</span></td><td><span class="no">✗ Manual, one by one</span></td><td><span class="meh">⚠ Limited</span></td><td><span class="meh">⚠ Varies</span></td></tr>
+      <tr><td>Auto-fix with one click</td><td><span class="yes">✓</span></td><td><span class="no">✗ Type every command</span></td><td><span class="meh">⚠ Sometimes</span></td><td><span class="yes">✓</span></td></tr>
+      <tr class="hi"><td>Startup time</td><td><span class="yes">&lt;1 second</span></td><td>Instant</td><td>5–10 seconds</td><td>3–20 seconds</td></tr>
+      <tr><td>Cost</td><td><span class="yes">Free</span></td><td><span class="yes">Free</span></td><td><span class="yes">Free</span></td><td><span class="no">$20–$50/yr</span></td></tr>
+      <tr class="hi"><td>Open source</td><td><span class="yes">✓ MIT</span></td><td><span class="yes">✓</span></td><td><span class="no">✗ Closed</span></td><td><span class="no">✗ Closed</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- HOW IT WORKS -->
+<div class="section" id="howto">
+  <p class="section-label">How It Works</p>
+  <h2 class="section-title">Fixed in 30 seconds</h2>
+  <p class="section-sub">Three steps. That's it.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-line"><div class="step-num">1</div><div class="step-connector"></div></div>
+      <div class="step-body">
+        <div class="step-title">Download & Run as Administrator</div>
+        <div class="step-desc">Download the 64 KB EXE — no extraction, no installer. Right-click and select "Run as administrator" (or Windows will auto-prompt via UAC). Opens in under 1 second.</div>
+        <div class="step-code">NetFixer.exe → right-click → Run as administrator</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-line"><div class="step-num">2</div><div class="step-connector"></div></div>
+      <div class="step-body">
+        <div class="step-title">Click "Scan Network"</div>
+        <div class="step-desc">All 10 diagnostic checks run sequentially. Each result streams in as a card — green for pass, red for fail, yellow for warnings. Takes about 5–10 seconds total.</div>
+        <div class="step-code">✓ WiFi Adapter — PASS<br/>✕ DNS Resolution — FAIL (timeout after 5000ms)<br/>⚠ Interface Metric — WARN (USB tethering metric = 5)</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-line"><div class="step-num">3</div><div class="step-connector"></div></div>
+      <div class="step-body">
+        <div class="step-title">Click "Fix All Issues"</div>
+        <div class="step-desc">NetFixer applies every available auto-fix in sequence. Watch the status badges flip from red to green. Re-scan to confirm everything passes.</div>
+        <div class="step-code">✓ DNS Resolution — FIXED (Google DNS applied)<br/>✓ Interface Metric — FIXED (WiFi = 10, USB = 100)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- FAQ -->
+<div class="section" id="faq">
+  <p class="section-label">FAQ</p>
+  <h2 class="section-title">Common questions</h2>
+  <p class="section-sub">Everything you need to know before downloading.</p>
+  <div class="faq">
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Is NetFixer safe? What does it change? <span class="arrow">+</span></div>
+      <div class="faq-a">NetFixer is fully open source — every line of code is readable on GitHub. It only modifies standard Windows network settings (DNS, proxy, interface metric, power plan, Winsock). Most changes are reversible. The Winsock and IP resets are the same operations Microsoft's own troubleshooter performs.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Why does it need Administrator privileges? <span class="arrow">+</span></div>
+      <div class="faq-a">Modifying network adapters, routing tables, DNS configuration, Winsock, and power plans requires elevated OS permissions. NetFixer requests this automatically via Windows UAC — you just click "Yes".</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">My WiFi shows "Connected" but internet doesn't work. Will this fix it? <span class="arrow">+</span></div>
+      <div class="faq-a">Yes — this is exactly the scenario NetFixer is built for. It systematically checks DHCP, DNS, routing metric, proxy settings, and internet reachability in order, fixing each layer. Most "connected but no internet" issues are resolved in the first scan.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Do I need to install .NET or any runtime? <span class="arrow">+</span></div>
+      <div class="faq-a">No. NetFixer targets .NET Framework 4.8 which is pre-installed on every Windows 10 version 1903 and later, and all Windows 11 versions. You don't need to download anything — just the 64 KB EXE.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Will a fix break something else? <span class="arrow">+</span></div>
+      <div class="faq-a">No. All fixes are standard Windows recovery operations. Setting DNS to Google's servers (8.8.8.8) is a common recommendation. Winsock and IP resets just rebuild the network stack from scratch — the same as "netsh winsock reset" which Microsoft recommends. Interface metric changes only affect routing priority and take effect immediately without reboot.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Is this only for WiFi or also Ethernet? <span class="arrow">+</span></div>
+      <div class="faq-a">The DNS, proxy, Winsock, internet reachability, and DHCP checks work for all connection types (WiFi, Ethernet, USB tethering). The WiFi-specific checks (power saving, Wi-Fi Direct) only apply to wireless adapters.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How is it only 64 KB? <span class="arrow">+</span></div>
+      <div class="faq-a">By targeting .NET Framework 4.8 — which is already installed on all modern Windows machines — there's no runtime to bundle with the EXE. The file only contains NetFixer's own code, compiled and optimized. Compare this to .NET 8 self-contained apps which are typically 150+ MB because they bundle the entire runtime.</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2>Your internet problem<br/><span class="grad">fixed in 30 seconds.</span></h2>
+  <p>Free. Portable. No install. No bloat. Open source.</p>
+  <div class="cta-btns">
+    <a href="https://github.com/D13056/NetFixer/releases/download/v1.0.0/NetFixer.exe" class="btn-big">
+      ⬇ Download NetFixer.exe — Free
+    </a>
+    <a href="https://github.com/D13056/NetFixer" target="_blank" class="btn-secondary" style="font-size:1rem;padding:16px 32px;">
+      ★ Star on GitHub
+    </a>
+  </div>
+  <p style="margin-top:24px;font-size:.82rem;color:var(--dim)">Windows 10 / 11 · 64 KB · .NET Framework 4.8 · MIT License</p>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">⚡ NetFixer</div>
+  <div class="footer-links">
+    <a href="https://github.com/D13056/NetFixer">GitHub</a>
+    <a href="https://github.com/D13056/NetFixer/releases">Releases</a>
+    <a href="https://github.com/D13056/NetFixer/issues">Issues</a>
+    <a href="https://github.com/D13056/NetFixer/blob/main/LICENSE">License</a>
+    <a href="https://github.com/D13056/NetFixer/blob/main/CONTRIBUTING.md">Contributing</a>
+  </div>
+  <div style="color:var(--dim)">Free Windows Network Repair Tool · MIT License · 2026</div>
+</footer>
+
+<script>
+  function toggle(el) {
+    el.closest('.faq-item').classList.toggle('open');
+  }
+
+  // Smooth entrance for check cards
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.check-card, .problem-card, .stat').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = `opacity .5s ${i * 0.05}s ease, transform .5s ${i * 0.05}s ease, border-color .2s, background .2s`;
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
