@@ -3,6 +3,12 @@
 > **Fix WiFi, DNS, Winsock, Proxy, DHCP & more — automatically. No installation. 64 KB. Instant.**
 
 <p align="center">
+  <a href="https://d13056.github.io/NetFixer/">
+    <img src="https://img.shields.io/badge/🌐%20%20Visit%20Full%20Website%20→%20d13056.github.io%2FNetFixer-0ea5e9?style=for-the-badge&logoColor=white" alt="NetFixer Landing Page"/>
+  </a>
+</p>
+
+<p align="center">
   <a href="https://github.com/D13056/NetFixer/releases/download/v1.0.0/NetFixer.exe">
     <img src="https://img.shields.io/badge/⬇%20Download-NetFixer.exe%20(64%20KB)-brightgreen?style=for-the-badge"/>
   </a>
