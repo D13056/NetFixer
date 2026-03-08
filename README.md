@@ -21,6 +21,9 @@
   <a href="https://github.com/D13056/NetFixer/releases">
     <img src="https://img.shields.io/github/v/release/D13056/NetFixer?style=for-the-badge&color=blue"/>
   </a>
+  <a href="https://paypal.me/D13056">
+    <img src="https://img.shields.io/badge/💙%20Donate-PayPal-0070ba?style=for-the-badge&logo=paypal"/>
+  </a>
 </p>
 
 <p align="center">
@@ -232,6 +235,16 @@ NetFixer/
 If NetFixer fixed your internet problem, please **star this repository** — it helps others find it when they search for Windows network repair tools.
 
 [![Star History Chart](https://api.star-history.com/svg?repos=D13056/NetFixer&type=Date)](https://star-history.com/#D13056/NetFixer)
+
+### 💙 Donate
+
+NetFixer is free and will always be free. If it saved your day, consider buying me a coffee!
+
+<p align="center">
+  <a href="https://paypal.me/D13056">
+    <img src="https://img.shields.io/badge/Donate%20via%20PayPal-0070ba?style=for-the-badge&logo=paypal&logoColor=white" alt="Donate via PayPal"/>
+  </a>
+</p>
 
 ---
 
