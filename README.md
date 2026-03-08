@@ -22,7 +22,7 @@
     <img src="https://img.shields.io/github/v/release/D13056/NetFixer?style=for-the-badge&color=blue"/>
   </a>
   <a href="https://paypal.me/D13056">
-    <img src="https://img.shields.io/badge/💙%20Donate-PayPal-0070ba?style=for-the-badge&logo=paypal"/>
+    <img src="docs/donate-btn.svg" alt="Donate via PayPal" width="200"/>
   </a>
 </p>
 
@@ -242,7 +242,7 @@ NetFixer is free and will always be free. If it saved your day, consider buying 
 
 <p align="center">
   <a href="https://paypal.me/D13056">
-    <img src="https://img.shields.io/badge/Donate%20via%20PayPal-0070ba?style=for-the-badge&logo=paypal&logoColor=white" alt="Donate via PayPal"/>
+    <img src="docs/donate-btn.svg" alt="Donate via PayPal" width="240"/>
   </a>
 </p>
 

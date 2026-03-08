@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="60" viewBox="0 0 280 60">
+  <defs>
+    <linearGradient id="paypalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#009cde;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#003087;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="shineGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.18"/>
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow" x="-10%" y="-20%" width="120%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#003087" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Button background pill -->
+  <rect x="2" y="2" width="276" height="56" rx="28" ry="28" fill="url(#paypalGrad)" filter="url(#shadow)"/>
+  <!-- Shine overlay -->
+  <rect x="2" y="2" width="276" height="28" rx="28" ry="28" fill="url(#shineGrad)"/>
+
+  <!-- PayPal "PP" logo mark -->
+  <!-- Outer P (blue tint, slightly offset) -->
+  <g transform="translate(28, 12)">
+    <!-- P2 (shadow layer, lighter blue) -->
+    <path d="M5 0 L13.5 0 C18 0 20.5 2.8 19.8 7.2 C19 12 15 14.5 10.5 14.5 L7.5 14.5 L6 22 L1 22 Z" fill="#60c4f4" opacity="0.85"/>
+    <!-- P1 (main white P) -->
+    <path d="M2 2.5 L10.5 2.5 C15 2.5 17.5 5.3 16.8 9.7 C16 14.5 12 17 7.5 17 L4.5 17 L3 24.5 L-2 24.5 Z" fill="#ffffff"/>
+    <!-- Inner cutout for P1 -->
+    <path d="M4.5 5.5 L8.5 5.5 C10.8 5.5 11.8 6.8 11.4 9 C11 11.5 9.2 12.8 6.8 12.8 L4.8 12.8 Z" fill="url(#paypalGrad)"/>
+    <!-- Inner cutout for P2 -->
+    <path d="M7.5 3 L11.5 3 C13.8 3 14.8 4.3 14.4 6.5 C14 9 12.2 10.3 9.8 10.3 L7.8 10.3 Z" fill="#009cde"/>
+  </g>
+
+  <!-- "Donate" label -->
+  <text x="148" y="36" font-family="'Helvetica Neue', Arial, sans-serif" font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.5" filter="url(#glow)">Donate</text>
+
+  <!-- "via PayPal" sub-label -->
+  <text x="148" y="51" font-family="'Helvetica Neue', Arial, sans-serif" font-size="10.5" font-weight="400" fill="#a8d8f8" text-anchor="middle" letter-spacing="1.5">VIA PAYPAL</text>
+
+  <!-- Subtle inner border highlight -->
+  <rect x="2" y="2" width="276" height="56" rx="28" ry="28" fill="none" stroke="#60c4f4" stroke-width="1" opacity="0.35"/>
+</svg>
