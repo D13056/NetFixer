@@ -241,9 +241,11 @@ If NetFixer fixed your internet problem, please **star this repository** — it 
 NetFixer is free and will always be free. If it saved your day, consider buying me a coffee!
 
 <p align="center">
-  <a href="https://paypal.me/D13056">
-    <img src="docs/donate-btn.png" alt="Donate via PayPal" width="240"/>
-  </a>
+  <form action="https://www.paypal.com/donate" method="post" target="_top">
+    <input type="hidden" name="hosted_button_id" value="L6EGHT5VQE8BL" />
+    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+    <img alt="" border="0" src="https://www.paypal.com/en_FI/i/scr/pixel.gif" width="1" height="1" />
+  </form>
 </p>
 
 ---

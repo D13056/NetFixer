@@ -291,8 +291,26 @@
 
     /* ── DONATE ── */
     .donate-section { padding: 80px 5%; text-align: center; }
+    .donate-amounts { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-bottom:20px; }
+    .amt-btn {
+      background: transparent; border: 2px solid var(--border); color: var(--muted);
+      font-size: .95rem; font-weight: 600; padding: 10px 22px; border-radius:999px;
+      cursor:pointer; transition: border-color .2s, color .2s, background .2s;
+    }
+    .amt-btn:hover, .amt-btn.active {
+      border-color: #0070ba; color: #fff;
+      background: linear-gradient(135deg,#0070ba,#003087);
+    }
+    .donate-custom { margin-bottom: 16px; }
+    .donate-custom input {
+      background: var(--card); border: 2px solid var(--border); color: var(--fg);
+      font-size: 1rem; padding: 10px 18px; border-radius: 12px; width: 220px;
+      text-align: center; outline: none; transition: border-color .2s;
+    }
+    .donate-custom input:focus { border-color: #0070ba; }
     #paypal-donate-container { max-width: 340px; margin: 24px auto 0; }
     .donate-note { margin-top: 16px; font-size: .82rem; color: var(--dim); }
+    .donate-thanks { display:none; color:#4ade80; font-weight:700; font-size:1.1rem; margin-top:20px; }
 
     /* ── FOOTER ── */
     footer {
@@ -595,11 +613,19 @@
   <p style="color:var(--muted);margin-bottom:36px;max-width:520px;margin-left:auto;margin-right:auto">
     NetFixer is completely free and open source. If it fixed your internet issue, consider buying me a coffee &mdash; it keeps development going!
   </p>
-  <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:inline-block;margin-top:8px;">
-    <input type="hidden" name="hosted_button_id" value="L6EGHT5VQE8BL" />
-    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" style="transition:transform .2s,filter .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.filter='brightness(1.1) drop-shadow(0 8px 24px rgba(0,112,186,.55))'" onmouseout="this.style.transform='';this.style.filter=''"/>
-    <img alt="" border="0" src="https://www.paypal.com/en_FI/i/scr/pixel.gif" width="1" height="1" />
-  </form>
+  <!-- Amount picker -->
+  <div class="donate-amounts">
+    <button class="amt-btn active" data-amount="3">$3</button>
+    <button class="amt-btn" data-amount="5">$5</button>
+    <button class="amt-btn" data-amount="10">$10</button>
+    <button class="amt-btn" data-amount="custom">Other</button>
+  </div>
+  <div class="donate-custom" id="donate-custom-wrap" style="display:none;margin-bottom:8px">
+    <input type="number" id="donate-custom-amt" placeholder="Enter amount (USD)" min="1" step="1"/>
+  </div>
+  <div id="paypal-donate-container"></div>
+  <p class="donate-thanks" id="donate-thanks">Thank you for your support! &#x1F499;</p>
+  <p class="donate-note">Powered by PayPal &mdash; 100% secure</p>
 </div>
 
 <div class="divider"></div>
@@ -654,6 +680,49 @@
     observer.observe(el);
   });
 </script>
-</body>
+
+<script src="https://www.paypal.com/sdk/js?client-id=AQCDEGXrGrs3In4mgVIHpSOh4V5dnyB1r-lojq-83NZlqNcselbkGvRGDwC9gn21MmGXwyU5-zaD-pCd&currency=USD&intent=capture&components=buttons" data-namespace="paypal_sdk"></script>
+<script>
+  let donateAmount = 3;
+
+  document.querySelectorAll('.amt-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const customWrap = document.getElementById('donate-custom-wrap');
+      if (btn.dataset.amount === 'custom') {
+        customWrap.style.display = 'block';
+        document.getElementById('donate-custom-amt').focus();
+      } else {
+        customWrap.style.display = 'none';
+        donateAmount = parseFloat(btn.dataset.amount);
+      }
+    });
+  });
+
+  document.getElementById('donate-custom-amt').addEventListener('input', e => {
+    const v = parseFloat(e.target.value);
+    if (!isNaN(v) && v >= 1) donateAmount = v;
+  });
+
+  window.paypal_sdk.Buttons({
+    style: { layout: 'vertical', color: 'blue', shape: 'pill', label: 'donate', height: 48 },
+    createOrder: (data, actions) => {
+      const customAmt = parseFloat(document.getElementById('donate-custom-amt').value);
+      const finalAmt = (document.getElementById('donate-custom-wrap').style.display !== 'none' && !isNaN(customAmt) && customAmt >= 1)
+                       ? customAmt : donateAmount;
+      return actions.order.create({
+        purchase_units: [{ description: 'NetFixer Donation', amount: { value: finalAmt.toFixed(2), currency_code: 'USD' } }]
+      });
+    },
+    onApprove: (data, actions) => actions.order.capture().then(() => {
+      document.getElementById('paypal-donate-container').style.display = 'none';
+      document.querySelector('.donate-amounts').style.display = 'none';
+      document.getElementById('donate-custom-wrap').style.display = 'none';
+      document.getElementById('donate-thanks').style.display = 'block';
+    }),
+    onError: err => { console.error('PayPal error:', err); alert('Something went wrong. Please try again.'); }
+  }).render('#paypal-donate-container');
+</script>
 </body>
 </html>
