@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://d13056.github.io/NetFixer/sitemap.xml
